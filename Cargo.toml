@@ -1,0 +1,36 @@
+[package]
+name = "containing"
+version = "0.1.0-preview"
+authors = ["Martin Habovštiak <martin.habovstiak@gmail.com>"]
+license = "MITNFA"
+repository = "https://github.com/Kixunil/containing"
+description = "Newtypes for dealing with collections that are guaranteed to be non-empty"
+categories = ["rust-patterns"]
+keywords = ["non-empty", "collections"]
+readme = "README.md"
+edition = "2021"
+rust-version = "1.63.0"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = ["std"]
+alloc = ["serde?/alloc"]
+std = ["alloc", "serde?/std"]
+parse_arg = ["dep:parse_arg", "std"]
+serde = ["dep:serde"]
+# Enables detection of newer rust versions to provide additional features
+# Turning it on may pull in dependencies that run build scripts and prolong compile time.
+# This feature will do nothing once our MSRV supports version detection natively and will
+# be removed using semver trick
+newer-rust = ["dep:if_rust_version"]
+
+[dependencies]
+if_rust_version = { version = "1.0.0", optional = true, default-features = false }
+parse_arg = { version = "1.0.1", optional = true, default-features = false }
+serde = { version = "1.0.0", optional = true, default-features = false }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(non_empty_no_paranoid_checks)'] }

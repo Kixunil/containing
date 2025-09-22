@@ -773,12 +773,12 @@ impl<'a, T> IntoIterator for &'a NonEmpty<T> where &'a T: IntoIterator {
 
 macro_rules! impl_refs {
     (impl<T $(: $bound:path)?> $trait:ident for SmartPtr<T> $($body:tt)+) => {
-        impl<T $(: $bound)?> $trait for &T $($body)+
+        impl<T $(: $bound)? + ?Sized> $trait for &T $($body)+
         #[cfg(feature = "alloc")]
-        impl<T $(: $bound)?> $trait for alloc::rc::Rc<T> $($body)+
+        impl<T $(: $bound)? + ?Sized> $trait for alloc::rc::Rc<T> $($body)+
         #[cfg(feature = "alloc")]
         #[cfg(target_has_atomic = "ptr")]
-        impl<T $(: $bound)?> $trait for alloc::sync::Arc<T> $($body)+
+        impl<T $(: $bound)? + ?Sized> $trait for alloc::sync::Arc<T> $($body)+
         impl_mut_refs! {
             impl<T $(: $bound)?> $trait for SmartPtr<T> $($body)+
         }

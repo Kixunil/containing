@@ -719,6 +719,30 @@ impl<T: ?Sized> AsRef<T> for NonEmpty<T> {
     }
 }
 
+impl<const N: usize, T> AsRef<NonEmpty<[T; N]>> for [T; N] {
+    fn as_ref(&self) -> &NonEmpty<[T; N]> {
+        NonEmpty::from_array_ref(self)
+    }
+}
+
+impl<const N: usize, T> AsMut<NonEmpty<[T; N]>> for [T; N] {
+    fn as_mut(&mut self) -> &mut NonEmpty<[T; N]> {
+        NonEmpty::from_array_mut(self)
+    }
+}
+
+impl<const N: usize, T> core::borrow::Borrow<NonEmpty<[T; N]>> for [T; N] {
+    fn borrow(&self) -> &NonEmpty<[T; N]> {
+        NonEmpty::from_array_ref(self)
+    }
+}
+
+impl<const N: usize, T> core::borrow::BorrowMut<NonEmpty<[T; N]>> for [T; N] {
+    fn borrow_mut(&mut self) -> &mut NonEmpty<[T; N]> {
+        NonEmpty::from_array_mut(self)
+    }
+}
+
 impl<const N: usize, T> AsRef<NonEmpty<[T]>> for [T; N] {
     fn as_ref(&self) -> &NonEmpty<[T]> {
         NonEmpty::from_array_ref(self)

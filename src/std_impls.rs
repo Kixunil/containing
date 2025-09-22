@@ -3,6 +3,11 @@ use std::vec::Vec;
 
 use super::{NonEmpty, WellBehavedCollection};
 
+// SOUNDNESS: the type is an OS string slice
+unsafe impl crate::traits::SliceOrSized for std::ffi::OsStr {}
+// SOUNDNESS: the type is an OS string slice semantically representing a path
+unsafe impl crate::traits::SliceOrSized for std::path::Path {}
+
 unsafe impl<T> WellBehavedCollection for HashSet<T> {}
 unsafe impl<K, V> WellBehavedCollection for HashMap<K, V> {}
 

@@ -83,10 +83,26 @@ pub trait PopFirst: Collection {
     fn pop_first(&mut self) -> Option<Self::Item>;
 }
 
+impl<T: Clone> PopFirst for &[T] {
+    fn pop_first(&mut self) -> Option<Self::Item> {
+        let item = self.first()?.clone();
+        *self = &self[1..];
+        Some(item)
+    }
+}
+
 /// Any collection that can have its last (back) element removed.
 pub trait PopLast: Collection {
     /// Removes the last (back) element from the collection.
     fn pop_last(&mut self) -> Option<Self::Item>;
+}
+
+impl<T: Clone> PopLast for &[T] {
+    fn pop_last(&mut self) -> Option<Self::Item> {
+        let item = self.last()?.clone();
+        *self = &self[..(self.len() - 1)];
+        Some(item)
+    }
 }
 
 /// Marks types that are slices or `Sized`.

@@ -325,6 +325,60 @@ impl<T: fmt::Pointer> fmt::Pointer for NonEmpty<T> {
     }
 }
 
+impl<T> core::ops::Index<usize> for NonEmpty<[T]> {
+    type Output = T;
+
+    fn index(&self, idx: usize) -> &Self::Output {
+        &self.as_inner()[idx]
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for NonEmpty<[T]> {
+    fn index_mut(&mut self, idx: usize) -> &mut Self::Output {
+        &mut self.as_inner_mut()[idx]
+    }
+}
+
+impl<T: core::ops::Index<core::ops::RangeFull> + Len + ?Sized> core::ops::Index<core::ops::RangeFull> for NonEmpty<T> where T::Output: Len + SliceOrSized {
+    type Output = NonEmpty<T::Output>;
+
+    fn index(&self, idx: core::ops::RangeFull) -> &Self::Output {
+        // SOUNDNESS: the range is full, so if T was non-empty the output is non-empty as well
+        unsafe {
+            unwrap_opt::<T, _>(NonEmpty::new_ref(&self.as_inner()[idx]))
+        }
+    }
+}
+
+impl<T: core::ops::IndexMut<core::ops::RangeFull> + Len + ?Sized> core::ops::IndexMut<core::ops::RangeFull> for NonEmpty<T> where T::Output: Len + SliceOrSized {
+    fn index_mut(&mut self, idx: core::ops::RangeFull) -> &mut Self::Output {
+        // SOUNDNESS: the range is full, so if T was non-empty the output is non-empty as well
+        unsafe {
+            unwrap_opt::<T, _>(NonEmpty::new_mut(&mut self.inner_mut()[idx]))
+        }
+    }
+}
+
+impl<T: core::ops::Index<core::ops::RangeTo<usize>> + ?Sized> core::ops::Index<core::ops::RangeTo<NonZeroUsize>> for NonEmpty<T> where T::Output: Len + SliceOrSized {
+    type Output = NonEmpty<T::Output>;
+
+    fn index(&self, idx: core::ops::RangeTo<NonZeroUsize>) -> &Self::Output {
+        // SOUNDNESS: the end of range is non-zero, so at least the first element is present
+        unsafe {
+            unwrap_opt::<T, _>(NonEmpty::new_ref(&self.as_inner()[..usize::from(idx.end)]))
+        }
+    }
+}
+
+impl<T: core::ops::IndexMut<core::ops::RangeTo<usize>> + ?Sized> core::ops::IndexMut<core::ops::RangeTo<NonZeroUsize>> for NonEmpty<T> where T::Output: Len + SliceOrSized {
+    fn index_mut(&mut self, idx: core::ops::RangeTo<NonZeroUsize>) -> &mut Self::Output {
+        // SOUNDNESS: the end of range is non-zero, so at least the first element is present
+        unsafe {
+            unwrap_opt::<T, _>(NonEmpty::new_mut(&mut self.inner_mut()[..usize::from(idx.end)]))
+        }
+    }
+}
+
 impl<T: ?Sized> NonEmpty<T> {
     pub(crate) fn as_inner_mut(&mut self) -> &mut T where T: traits::FixedLenCollection {
         // SOUNDNESS: guaranteed by the trait

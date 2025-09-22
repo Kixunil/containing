@@ -80,3 +80,11 @@ impl std::io::Write for crate::vec::NonEmptyVec<u8> {
         self.with_vec(move |vec| vec.flush())
     }
 }
+
+impl<K: Eq + core::hash::Hash + core::borrow::Borrow<Q>, V, Q: Eq + core::hash::Hash + ?Sized> core::ops::Index<&Q> for NonEmpty<std::collections::HashMap<K, V>> {
+    type Output = V;
+
+    fn index(&self, key: &Q) -> &Self::Output {
+        &self.as_inner()[key]
+    }
+}

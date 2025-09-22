@@ -7,6 +7,7 @@ use alloc::sync::Arc;
 use alloc::string::String;
 
 use super::WellBehavedCollection;
+use super::NonEmpty;
 
 super::impl_collection!(Vec<T>, BTreeSet<T>, VecDeque<T>);
 super::delegate_first_and_co!(<T> Vec<T>);
@@ -231,3 +232,11 @@ unsafe impl<const N: usize, T> crate::traits::FixedLenCollection for Rc<[T; N]> 
 // references.
 #[cfg(target_has_atomic = "ptr")]
 unsafe impl<const N: usize, T> crate::traits::FixedLenCollection for Arc<[T; N]> {}
+
+impl<K: Ord + core::borrow::Borrow<Q>, V, Q: Ord + ?Sized> core::ops::Index<&Q> for NonEmpty<alloc::collections::BTreeMap<K, V>> {
+    type Output = V;
+
+    fn index(&self, key: &Q) -> &Self::Output {
+        &self.as_inner()[key]
+    }
+}

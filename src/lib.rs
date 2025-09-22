@@ -248,6 +248,10 @@ mod non_empty {
     /// more idiomatic to use outer references instead. That means instead of `NonEmpty<&T>` you'd
     /// write `&NonEmpty<T>`. This style makes some patterns more convenient. The type has methods
     /// to cast the references as needed.
+    ///
+    /// However there is an exception to this rule: when a function needs to take in a reference to
+    /// a non-empty collection which it may modify such that it would become empty the correct way
+    /// to express this is by accepting e.g. `NonEmpty<&mut &[u8]>` rather than `&mut NonEmpty<&[u8]>` (which wouldn't work).
     #[repr(transparent)]
     #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
     pub struct NonEmpty<T: ?Sized>(T);
